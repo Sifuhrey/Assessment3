@@ -17,6 +17,7 @@ private val retrofit = Retrofit.Builder()
     .addConverterFactory(MoshiConverterFactory.create(moshi))
     .baseUrl(BASE_URL)
     .build()
+
 interface CinemaApiService {
     @GET("static-api.json")
     suspend fun getCinema(): List<Cinema>
@@ -25,5 +26,9 @@ interface CinemaApiService {
 object CinemaApi{
     val service: CinemaApiService by lazy {
         retrofit.create(CinemaApiService::class.java)
+    }
+
+    fun getCinema(imageId: String): String{
+        return "$BASE_URL$imageId.jpg"
     }
 }

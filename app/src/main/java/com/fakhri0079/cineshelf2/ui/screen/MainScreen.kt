@@ -1,8 +1,15 @@
 package com.fakhri0079.cineshelf2.ui.screen
 
-import android.R.attr.text
 import android.content.res.Configuration
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -10,11 +17,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.fakhri0079.cineshelf2.R
+import com.fakhri0079.cineshelf2.model.Cinema
+import com.fakhri0079.cineshelf2.network.CinemaApi
 import com.fakhri0079.cineshelf2.ui.theme.CineShelf2Theme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,18 +57,32 @@ fun MainScreen() {
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
     val viewModel: MainViewModel = viewModel()
-    Text(
-        text = "Hello Android",
-        modifier = modifier
-    )
+    val data by viewModel.data
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize().padding(4.dp),
+        columns = GridCells.Fixed(2)
+    ) {
+        items(data){
+            ListItem(cinema = it)
+        }
+    }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun ListItem(cinema: Cinema) {
+    Box(
+        modifier = Modifier.padding(4.dp).border(1.dp, Color.Gray, shape = RoundedCornerShape(6.dp))
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(CinemaApi.getCinema(cinema.imageId))
+                .crossfade(true)
+                .build(),
+            contentDescription = stringResource(id = R.string.gambar, cinema.nama),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxWidth().padding(4.dp).border(1.dp, Color.Unspecified,shape = RoundedCornerShape(10.dp))
+        )
+    }
 }
 
 @Preview(showBackground = true)
