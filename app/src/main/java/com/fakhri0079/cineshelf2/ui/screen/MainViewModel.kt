@@ -26,8 +26,9 @@ class MainViewModel : ViewModel() {
      fun retrieveData() {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = ApiStatus.LOADING
+
             try {
-                data.value = CinemaApi.service.getCinema()
+                data.value = CinemaApi.service.getCinema().cinema
                 status.value = ApiStatus.SUCCESS
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure: ${e.message}")

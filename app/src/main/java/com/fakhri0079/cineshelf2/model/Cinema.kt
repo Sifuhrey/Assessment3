@@ -1,7 +1,11 @@
 package com.fakhri0079.cineshelf2.model
 
 data class Cinema(
-    val nama: String,
-    val namaLatin: String,
-    val imageId: String
+    val id: String,
+    val userId: String,
+    val title: String,
+    val description: String,
+    val rating: String,
+    val isWatched: Boolean,
+    val imageUrl: String
 )

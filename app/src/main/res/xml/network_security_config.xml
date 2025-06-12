@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">202.74.74.239</domain>
+        <!-- You can add other specific domains or IPs here -->
+        <!-- <domain includeSubdomains="true">your.other.domain.com</domain> -->
+    </domain-config>
+    <!-- You can also have a base-config to allow all cleartext traffic (NOT RECOMMENDED) -->
+
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+</network-security-config>

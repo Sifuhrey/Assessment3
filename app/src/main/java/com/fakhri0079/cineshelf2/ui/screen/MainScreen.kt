@@ -127,10 +127,10 @@ fun ListItem(cinema: Cinema) {
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(CinemaApi.getCinema(cinema.imageId))
+                .data(CinemaApi.getCinema(cinema.imageUrl))
                 .crossfade(true)
                 .build(),
-            contentDescription = stringResource(id = R.string.gambar, cinema.nama),
+            contentDescription = stringResource(id = R.string.gambar, cinema.title),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
             error = painterResource(id = R.drawable.broken_img),
@@ -147,12 +147,12 @@ fun ListItem(cinema: Cinema) {
                 .padding(4.dp)
         ) {
             Text(
-                text = cinema.nama,
+                text = cinema.title,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Text(
-                text = cinema.namaLatin,
+                text = cinema.description,
                 fontStyle = FontStyle.Italic,
                 fontSize = 14.sp,
                 color = Color.White

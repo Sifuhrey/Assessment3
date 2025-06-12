@@ -1,13 +1,13 @@
 package com.fakhri0079.cineshelf2.network
 
-import com.fakhri0079.cineshelf2.model.Cinema
+import com.fakhri0079.cineshelf2.model.CinemaResponse
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 
-private const val BASE_URL = "https://raw.githubusercontent.com/indraazimi/mobpro1-compose/static-api/"
+private const val BASE_URL = "http://202.74.74.239:3000/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -19,8 +19,9 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface CinemaApiService {
-    @GET("static-api.json")
-    suspend fun getCinema(): List<Cinema>
+
+    @GET("/cinemas?userId=example@example.com")
+    suspend fun getCinema(): CinemaResponse
 }
 
 object CinemaApi{
@@ -29,7 +30,7 @@ object CinemaApi{
     }
 
     fun getCinema(imageId: String): String{
-        return "$BASE_URL$imageId.jpg"
+        return imageId
     }
 }
 
