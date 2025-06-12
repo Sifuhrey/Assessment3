@@ -20,7 +20,7 @@ private val retrofit = Retrofit.Builder()
 
 interface CinemaApiService {
 
-    @GET("/cinemas")
+    @GET("/cinemas?userId=example@example.com")
     suspend fun getCinema(): CinemaResponse
 }
 

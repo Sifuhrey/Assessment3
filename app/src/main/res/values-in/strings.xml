@@ -7,4 +7,5 @@
     <string name="tutup">Tutup</string>
     <string name="notlogin">Anda belum masuk akun, silahkan login terlebih dahulu.</string>
     <string name="login">Masuk Akun</string>
+    <string name="add_movie">Tambah Film</string>
 </resources>

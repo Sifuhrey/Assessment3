@@ -94,10 +94,8 @@ fun ProfilDialog(
                             color = MaterialTheme.colorScheme.error
                         )
                     }
-
                 }
             }
-
         }
     }
 }
