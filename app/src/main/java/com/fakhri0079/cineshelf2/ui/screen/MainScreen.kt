@@ -89,6 +89,7 @@ fun ListItem(cinema: Cinema) {
             contentDescription = stringResource(id = R.string.gambar, cinema.nama),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
+            error = painterResource(id = R.drawable.broken_img),
             modifier = Modifier.fillMaxWidth().padding(4.dp).border(1.dp, Color.Unspecified,shape = RoundedCornerShape(10.dp))
         )
         Column(
