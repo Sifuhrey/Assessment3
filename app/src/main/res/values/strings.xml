@@ -4,4 +4,5 @@
     <string name="gambar">Picture %1$s</string>
     <string name="error">Failed to load cinema data, connection error</string>
     <string name="profil">Profile</string>
+    <string name="tutup">Close</string>
 </resources>

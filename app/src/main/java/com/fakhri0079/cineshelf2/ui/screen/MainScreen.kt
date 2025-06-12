@@ -29,6 +29,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,6 +73,7 @@ fun MainScreen() {
     val context = LocalContext.current
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
+    var showDialog by remember { mutableStateOf((false)) }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -82,10 +86,10 @@ fun MainScreen() {
                 ),
                 actions = {
                     IconButton(onClick = {
-                        if (user.email.isEmpty()){
-                            CoroutineScope(Dispatchers.IO).launch { signIn(context,dataStore) }
-                        }else{
-                            Log.d("SIGN-IN","User: $user")
+                        if (user.email.isEmpty()) {
+                            CoroutineScope(Dispatchers.IO).launch { signIn(context, dataStore) }
+                        } else {
+                            showDialog = true
                         }
 
                     }) {
@@ -100,6 +104,14 @@ fun MainScreen() {
         }
     ) { innerPadding ->
         ScreenContent(Modifier.padding(innerPadding))
+        if (showDialog) {
+            ProfilDialog(
+                user = user,
+                onDismissRequest = { showDialog = false },
+            ) {
+                showDialog = false
+            }
+        }
 
     }
 }
@@ -115,7 +127,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 CircularProgressIndicator()
             }
         }
@@ -138,12 +150,12 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Text(text = stringResource(id = R.string.error))
                 Button(
-                    onClick = {viewModel.retrieveData()},
+                    onClick = { viewModel.retrieveData() },
                     modifier = Modifier.padding(top = 16.dp),
-                    contentPadding = PaddingValues(horizontal = 32.dp,vertical = 16.dp)
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
                 ) {
                     Text(text = stringResource(id = R.string.try_again))
                 }
@@ -198,7 +210,7 @@ fun ListItem(cinema: Cinema) {
     }
 }
 
-private suspend fun signIn(context: Context,dataStore: UserDataStore){
+private suspend fun signIn(context: Context, dataStore: UserDataStore) {
     val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.API_KEY)
@@ -210,27 +222,27 @@ private suspend fun signIn(context: Context,dataStore: UserDataStore){
 
     try {
         val credentialManager = CredentialManager.create(context)
-        val result = credentialManager.getCredential(context,request)
-        handleSignIn(result,dataStore)
-    } catch (e: GetCredentialException){
-        Log.e("SIGN-IN","Error: ${e.errorMessage}")
+        val result = credentialManager.getCredential(context, request)
+        handleSignIn(result, dataStore)
+    } catch (e: GetCredentialException) {
+        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
-private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserDataStore){
+private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserDataStore) {
     val credential = result.credential
-    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL){
+    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-            val nama = googleId.displayName?: ""
+            val nama = googleId.displayName ?: ""
             val email = googleId.id
             val photoUrl = googleId.profilePictureUri.toString()
-            dataStore.saveData(User(nama,email,photoUrl))
-        }catch (e: GoogleIdTokenParsingException){
-            Log.e("SIGN-IN","Error: ${e.message}")
+            dataStore.saveData(User(nama, email, photoUrl))
+        } catch (e: GoogleIdTokenParsingException) {
+            Log.e("SIGN-IN", "Error: ${e.message}")
         }
-    } else{
-        Log.e("SIGN-IN","Error: unrecognized custom credential type}")
+    } else {
+        Log.e("SIGN-IN", "Error: unrecognized custom credential type}")
     }
 }
 
