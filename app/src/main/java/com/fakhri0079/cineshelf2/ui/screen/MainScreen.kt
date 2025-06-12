@@ -89,9 +89,11 @@ fun MainScreen() {
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
     var showDialog by remember { mutableStateOf((false)) }
+    var showCinemaDialog by remember { mutableStateOf(false) }
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(CropImageContract()){
         bitmap = getCroppedImage(context.contentResolver,it)
+        if (bitmap != null) showCinemaDialog = true
     }
 
 
@@ -150,6 +152,17 @@ fun MainScreen() {
             ) {
                 CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
                 showDialog = false
+            }
+        }
+
+        if (showCinemaDialog) {
+            CinemaDialog(
+                bitmap = bitmap,
+                onDismissRequest = {showCinemaDialog = false}
+            ) { title, description, rating, isWatched ->
+                Log.d("TAMBAH", "$title, $description, $rating, $isWatched ditambahkan.")
+                showCinemaDialog = false
+
             }
         }
 

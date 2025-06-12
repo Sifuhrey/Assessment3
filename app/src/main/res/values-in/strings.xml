@@ -5,7 +5,16 @@
     <string name="gambar">Gambar %1$s</string>
     <string name="profil">Profil</string>
     <string name="tutup">Tutup</string>
+    <string name="logout">Keluar Akun</string>
     <string name="notlogin">Anda belum masuk akun, silahkan login terlebih dahulu.</string>
     <string name="login">Masuk Akun</string>
     <string name="add_movie">Tambah Film</string>
+    <string name="title">Judul</string>
+    <string name="description">Deskripsi</string>
+    <string name="rating">Nilai</string>
+    <string name="iswatched">Sudah ditonton?</string>
+    <string name="done">Sudah</string>
+    <string name="notdone">Belum</string>
+    <string name="batal">Batal</string>
+    <string name="simpan">Simpan</string>
 </resources>

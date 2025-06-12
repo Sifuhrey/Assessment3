@@ -5,8 +5,16 @@
     <string name="error">Failed to load cinema data, connection error</string>
     <string name="profil">Profile</string>
     <string name="tutup">Close</string>
-    <string name="logout" translatable="false">Logout</string>
+    <string name="logout">Logout</string>
     <string name="notlogin">You\'re not logged in, please login first.</string>
     <string name="login">Login</string>
     <string name="add_movie">Add Movie</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="rating">Rating</string>
+    <string name="iswatched">Watched yet?</string>
+    <string name="done">Done</string>
+    <string name="notdone">Not yet</string>
+    <string name="batal">Cancel</string>
+    <string name="simpan">Save</string>
 </resources>
