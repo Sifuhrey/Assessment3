@@ -76,6 +76,7 @@ fun MainScreen() {
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
     var showDialog by remember { mutableStateOf((false)) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -165,6 +166,16 @@ fun ScreenContent(modifier: Modifier = Modifier) {
             }
         }
 
+        ApiStatus.EMPTY -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = stringResource(id = R.string.notlogin))
+
+            }
+        }
     }
 
 }

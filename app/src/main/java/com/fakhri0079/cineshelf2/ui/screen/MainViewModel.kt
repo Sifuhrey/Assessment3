@@ -29,10 +29,16 @@ class MainViewModel : ViewModel() {
 
             try {
                 data.value = CinemaApi.service.getCinema().cinema
+
                 status.value = ApiStatus.SUCCESS
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure: ${e.message}")
-                status.value = ApiStatus.FAILED
+                if(e.message == "HTTP 500 Internal Server Error"){
+                    status.value = ApiStatus.EMPTY
+                }else{
+                    status.value = ApiStatus.FAILED
+                }
+
             }
         }
     }

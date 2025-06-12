@@ -6,4 +6,6 @@
     <string name="profil">Profile</string>
     <string name="tutup">Close</string>
     <string name="logout" translatable="false">Logout</string>
+    <string name="notlogin">You\'re not logged in, please login first.</string>
+    <string name="login">Login</string>
 </resources>

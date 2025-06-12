@@ -20,7 +20,7 @@ private val retrofit = Retrofit.Builder()
 
 interface CinemaApiService {
 
-    @GET("/cinemas?userId=example@example.com")
+    @GET("/cinemas")
     suspend fun getCinema(): CinemaResponse
 }
 
@@ -34,4 +34,4 @@ object CinemaApi{
     }
 }
 
-enum class ApiStatus {LOADING, SUCCESS, FAILED}
+enum class ApiStatus {LOADING, SUCCESS, FAILED, EMPTY}
