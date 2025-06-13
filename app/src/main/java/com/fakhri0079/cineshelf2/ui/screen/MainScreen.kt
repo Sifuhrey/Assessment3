@@ -339,7 +339,7 @@ fun ListItem(
                         color = Color.White
                     )
                     Text(
-                        text = if (cinema.isWatched) stringResource(R.string.done) else stringResource(
+                        text ="Status: "+ if (cinema.isWatched) stringResource(R.string.done) else stringResource(
                             R.string.notdone
                         ),
                         fontStyle = FontStyle.Italic,
