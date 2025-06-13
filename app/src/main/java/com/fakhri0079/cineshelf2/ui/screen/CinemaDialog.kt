@@ -9,12 +9,16 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
@@ -137,12 +141,13 @@ fun CinemaDialog(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text(text = stringResource(R.string.description)) },
-                    maxLines = 1,
+
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         imeAction = ImeAction.Next
                     ),
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 10.dp)
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 10.dp).height(200.dp)
+                        .scrollable(orientation = Orientation.Vertical, state = rememberScrollState())
                 )
 
                 Slider(
