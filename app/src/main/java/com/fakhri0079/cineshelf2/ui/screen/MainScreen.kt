@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -184,9 +185,9 @@ fun MainScreen() {
         }
         if (showCinemaDialog) {
             CinemaDialog(
-                bitmap = bitmap,
+
                 onDismissRequest = { showCinemaDialog = false }
-            ) { title, description, rating, isWatched ->
+            ) { title, description, rating, isWatched, bitmap ->
                 viewModel.saveData(user.email, title, description, rating, isWatched, bitmap!!)
                 showCinemaDialog = false
 
@@ -210,11 +211,21 @@ fun ScreenContent(
 
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
+    var editData by remember { mutableStateOf<Cinema?>(null) }
 
     LaunchedEffect(userId) {
         viewModel.retrieveData('"' + userId + '"')
     }
-
+    if (editData != null){
+        CinemaDialog(
+            cinema = editData!!,
+            onDismissRequest = {editData = null},
+            onConfirmation = { title, description, rating, isWatched, bitmap ->
+                viewModel.updateData(editData!!.id, userId, title, description, rating, isWatched, bitmap)
+                editData = null
+            }
+        )
+    }
     when (status) {
         ApiStatus.LOADING -> {
             Box(
@@ -239,7 +250,9 @@ fun ScreenContent(
                         onDeleteClicked = {
                             onDeleteRequest(it.id)
                         }
-                    )
+                    ){
+                      editData = it
+                    }
                 }
             }
         }
@@ -271,18 +284,19 @@ fun ScreenContent(
             }
         }
     }
-
 }
 
 @Composable
 fun ListItem(
     cinema: Cinema,
-    onDeleteClicked: () -> Unit = {}
+    onDeleteClicked: () -> Unit = {},
+    onUpdateClicked: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .padding(4.dp)
-            .border(1.dp, Color.Gray, shape = RoundedCornerShape(6.dp)),
+            .border(1.dp, Color.Gray, shape = RoundedCornerShape(6.dp))
+            .clickable{ onUpdateClicked()},
         contentAlignment = Alignment.BottomCenter
     ) {
         AsyncImage(

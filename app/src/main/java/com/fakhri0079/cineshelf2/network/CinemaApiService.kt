@@ -12,6 +12,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -31,7 +32,7 @@ interface CinemaApiService {
 
     @GET("/cinemas")
     suspend fun getCinema(
-    @Query("userId") userId: String
+        @Query("userId") userId: String
     ): CinemaResponse
 
     @Multipart
@@ -43,22 +44,33 @@ interface CinemaApiService {
         @Part("rating") rating: RequestBody,
         @Part("isWatched") isWatched: RequestBody,
         @Part imageUrl: MultipartBody.Part
-    ) : OpStatus
+    ): OpStatus
 
     @DELETE("/cinemas/{id}")
     suspend fun delete(
         @Path("id") id: Int
+    ): OpStatus
+
+    @Multipart
+    @PUT("/cinemas/{id}")
+    suspend fun update(
+        @Path("id") id: Int,
+        @Part("title") title: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("rating") rating: RequestBody,
+        @Part("isWatched") isWatched: RequestBody,
+        @Part imageUrl: MultipartBody.Part? = null
     ) : OpStatus
 }
 
-object CinemaApi{
+object CinemaApi {
     val service: CinemaApiService by lazy {
         retrofit.create(CinemaApiService::class.java)
     }
 
-    fun getCinema(imageId: String): String{
+    fun getCinema(imageId: String): String {
         return imageId
     }
 }
 
-enum class ApiStatus {LOADING, SUCCESS, FAILED, EMPTY}
+enum class ApiStatus { LOADING, SUCCESS, FAILED, EMPTY }

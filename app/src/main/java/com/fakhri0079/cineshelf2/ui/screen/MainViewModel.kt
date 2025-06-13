@@ -78,14 +78,47 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun deleteData(id: Int,userId: String) {
+    fun updateData(
+        id: Int,
+        userId: String,
+        title: String,
+        description: String,
+        rating: Float,
+        isWatched: Boolean,
+        bitmap: Bitmap?
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val bitmapPart = bitmap?.toMultipartBody()
+                val result = CinemaApi.service.update(
+                    id,
+                    title.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    description.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    rating.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
+                    isWatched.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
+                    bitmapPart
+                )
+                if (result.message == "Cinema updated successfully") {
+                    Log.d("MainViewModel", "Success sending: ${result.message} $userId")
+                    retrieveData('"' + userId + '"')
+                } else
+                    throw Exception(result.message)
+            } catch (e: Exception){
+                Log.d("MainViewModel", "Failure updating: ${e.message}")
+                errorMessage.value = "Error: ${e.message}"
+            }
+        }
+
+    }
+
+    fun deleteData(id: Int, userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = CinemaApi.service.delete(id)
                 if (result.message == "Cinema deleted successfully") {
                     retrieveData('"' + userId + '"')
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure erasing: ${e.message}")
                 errorMessage.value = "Error: ${e.message}"
             }
@@ -98,7 +131,8 @@ class MainViewModel : ViewModel() {
         val byteArray = stream.toByteArray()
         val requestBody =
             byteArray.toRequestBody(
-                "image/jpeg".toMediaTypeOrNull(), 0, byteArray.size)
+                "image/jpeg".toMediaTypeOrNull(), 0, byteArray.size
+            )
         return MultipartBody.Part.createFormData("image", "image.jpg", requestBody)
 
     }

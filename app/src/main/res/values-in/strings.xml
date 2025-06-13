@@ -20,4 +20,5 @@
     <string name="delete_question">Apakah anda yakin ingin menghapus data ini?</string>
     <string name="delete">Hapus</string>
     <string name="abort">Batal</string>
+    <string name="change">Ganti Gambar</string>
 </resources>
