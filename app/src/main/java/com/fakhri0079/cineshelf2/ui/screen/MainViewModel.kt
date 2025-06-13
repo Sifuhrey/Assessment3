@@ -28,8 +28,7 @@ class MainViewModel : ViewModel() {
         private set
 
 
-
-     fun retrieveData(userId: String) {
+    fun retrieveData(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = ApiStatus.LOADING
 
@@ -39,9 +38,9 @@ class MainViewModel : ViewModel() {
                 status.value = ApiStatus.SUCCESS
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure retrieve: ${e.message}")
-                if(e.message == "HTTP 500 Internal Server Error"){
+                if (e.message == "HTTP 500 Internal Server Error") {
                     status.value = ApiStatus.EMPTY
-                }else{
+                } else {
                     status.value = ApiStatus.FAILED
                 }
 
@@ -56,7 +55,7 @@ class MainViewModel : ViewModel() {
         rating: Float,
         isWatched: Boolean,
         bitmap: Bitmap
-    ){
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = CinemaApi.service.postCinema(
@@ -70,9 +69,9 @@ class MainViewModel : ViewModel() {
                 if (result.message == "Cinema created successfully") {
                     Log.d("MainViewModel", "Success sending: ${result.message} $userId")
                     retrieveData(userId)
-                }
-                else throw Exception(result.message)
-            }catch (e: Exception){
+                } else
+                    throw Exception(result.message)
+            } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure sending: ${e.message}")
                 errorMessage.value = "Error: ${e.message}"
             }
@@ -80,14 +79,18 @@ class MainViewModel : ViewModel() {
 
     }
 
-    private fun Bitmap.toMultipartBody() : MultipartBody.Part {
+    private fun Bitmap.toMultipartBody(): MultipartBody.Part {
         val stream = ByteArrayOutputStream()
         compress(Bitmap.CompressFormat.JPEG, 80, stream)
         val byteArray = stream.toByteArray()
-        val requestBody = byteArray.toRequestBody("image/jpeg".toMediaTypeOrNull(),0,byteArray.size)
+        val requestBody =
+            byteArray.toRequestBody(
+                "image/jpeg".toMediaTypeOrNull(), 0, byteArray.size)
         return MultipartBody.Part.createFormData("image", "image.jpg", requestBody)
 
     }
 
-    fun clearMessage(){ errorMessage.value = null}
+    fun clearMessage() {
+        errorMessage.value = null
+    }
 }

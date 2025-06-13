@@ -184,7 +184,7 @@ fun ScreenContent(viewModel: MainViewModel,userId: String,modifier: Modifier = M
     val status by viewModel.status.collectAsState()
 
     LaunchedEffect(userId) {
-        viewModel.retrieveData(userId)
+        viewModel.retrieveData('"'+userId+'"')
     }
 
     when (status) {
