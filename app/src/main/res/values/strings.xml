@@ -17,7 +17,7 @@
     <string name="notdone">Not Watched</string>
     <string name="batal">Cancel</string>
     <string name="simpan">Save</string>
-    <string name="delete_question">Do you really wanna delete this movie?</string>
+    <string name="delete_question">Do you really want to delete this movie?</string>
     <string name="delete">Delete</string>
     <string name="abort">Cancel</string>
 </resources>
