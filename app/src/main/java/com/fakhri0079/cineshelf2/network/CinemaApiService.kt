@@ -1,11 +1,18 @@
 package com.fakhri0079.cineshelf2.network
 
 import com.fakhri0079.cineshelf2.model.CinemaResponse
+import com.fakhri0079.cineshelf2.model.OpStatus
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
+import retrofit2.http.Query
 
 private const val BASE_URL = "http://202.74.74.239:3000/"
 
@@ -20,8 +27,22 @@ private val retrofit = Retrofit.Builder()
 
 interface CinemaApiService {
 
-    @GET("/cinemas?userId=example@example.com")
-    suspend fun getCinema(): CinemaResponse
+    @GET("/cinemas")
+    suspend fun getCinema(
+    @Query("userId") userId: String
+    ): CinemaResponse
+
+    @Multipart
+    @POST("/cinemas")
+    suspend fun postCinema(
+        @Part("userId") userId: String,
+        @Part("title") title: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("rating") rating: RequestBody,
+        @Part("isWatched") isWatched: RequestBody,
+        @Part imageUrl: MultipartBody.Part
+    ) : OpStatus
+
 }
 
 object CinemaApi{

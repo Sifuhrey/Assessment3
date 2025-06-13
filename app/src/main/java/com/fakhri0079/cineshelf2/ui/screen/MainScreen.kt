@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -88,6 +90,8 @@ fun MainScreen() {
     val context = LocalContext.current
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
+    val viewModel: MainViewModel = viewModel()
+    val errorMessage by viewModel.errorMessage
     var showDialog by remember { mutableStateOf((false)) }
     var showCinemaDialog by remember { mutableStateOf(false) }
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
@@ -144,7 +148,7 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        ScreenContent(Modifier.padding(innerPadding))
+        ScreenContent(viewModel,user.email,Modifier.padding(innerPadding))
         if (showDialog) {
             ProfilDialog(
                 user = user,
@@ -160,21 +164,28 @@ fun MainScreen() {
                 bitmap = bitmap,
                 onDismissRequest = {showCinemaDialog = false}
             ) { title, description, rating, isWatched ->
-                Log.d("TAMBAH", "$title, $description, $rating, $isWatched ditambahkan.")
+                viewModel.saveData(user.email,title,description,rating,isWatched,bitmap!!)
                 showCinemaDialog = false
 
             }
+        }
+        if (errorMessage != null){
+            Toast.makeText(context,errorMessage,Toast.LENGTH_LONG).show()
+            viewModel.clearMessage()
         }
 
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier) {
-    val viewModel: MainViewModel = viewModel()
+fun ScreenContent(viewModel: MainViewModel,userId: String,modifier: Modifier = Modifier) {
+
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
+    LaunchedEffect(userId) {
+        viewModel.retrieveData(userId)
+    }
 
     when (status) {
         ApiStatus.LOADING -> {
@@ -208,7 +219,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
             ) {
                 Text(text = stringResource(id = R.string.error))
                 Button(
-                    onClick = { viewModel.retrieveData() },
+                    onClick = { viewModel.retrieveData(userId) },
                     modifier = Modifier.padding(top = 16.dp),
                     contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
                 ) {
