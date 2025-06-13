@@ -411,6 +411,7 @@ private fun getCroppedImage(
     val uri = result.uriContent ?: return null
 
     return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        @Suppress("DEPRECATION")
         MediaStore.Images.Media.getBitmap(resolver, uri)
     } else {
         val source = ImageDecoder.createSource(resolver, uri)
