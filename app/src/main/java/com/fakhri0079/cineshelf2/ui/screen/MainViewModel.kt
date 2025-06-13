@@ -68,7 +68,7 @@ class MainViewModel : ViewModel() {
                 )
                 if (result.message == "Cinema created successfully") {
                     Log.d("MainViewModel", "Success sending: ${result.message} $userId")
-                    retrieveData(userId)
+                    retrieveData('"' + userId + '"')
                 } else
                     throw Exception(result.message)
             } catch (e: Exception) {
@@ -76,7 +76,20 @@ class MainViewModel : ViewModel() {
                 errorMessage.value = "Error: ${e.message}"
             }
         }
+    }
 
+    fun deleteData(id: Int,userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = CinemaApi.service.delete(id)
+                if (result.message == "Cinema deleted successfully") {
+                    retrieveData('"' + userId + '"')
+                }
+            }catch (e: Exception){
+                Log.d("MainViewModel", "Failure erasing: ${e.message}")
+                errorMessage.value = "Error: ${e.message}"
+            }
+        }
     }
 
     private fun Bitmap.toMultipartBody(): MultipartBody.Part {

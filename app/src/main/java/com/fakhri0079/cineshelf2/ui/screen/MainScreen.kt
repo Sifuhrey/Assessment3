@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -94,9 +96,11 @@ fun MainScreen() {
     val errorMessage by viewModel.errorMessage
     var showDialog by remember { mutableStateOf((false)) }
     var showCinemaDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<Int?>(null) }
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
-    val launcher = rememberLauncherForActivityResult(CropImageContract()){
-        bitmap = getCroppedImage(context.contentResolver,it)
+    val launcher = rememberLauncherForActivityResult(CropImageContract()) {
+        bitmap = getCroppedImage(context.contentResolver, it)
         if (bitmap != null) showCinemaDialog = true
     }
 
@@ -148,7 +152,12 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        ScreenContent(viewModel,user.email,Modifier.padding(innerPadding))
+        ScreenContent(
+            viewModel, user.email, Modifier.padding(innerPadding),
+            onDeleteRequest = { cinema ->
+                itemToDelete = cinema
+                showDeleteDialog = true
+            })
         if (showDialog) {
             ProfilDialog(
                 user = user,
@@ -158,19 +167,33 @@ fun MainScreen() {
                 showDialog = false
             }
         }
+        if (showDeleteDialog && itemToDelete != null) {
+            DeleteDialog( // Assuming you have a DeleteDialog composable
 
+                onDismissRequest = {
+                    showDeleteDialog = false
+                    itemToDelete = null
+                },
+                onConfirmation = {
+
+                    viewModel.deleteData(itemToDelete!!, user.email)
+                    showDeleteDialog = false
+                    itemToDelete = null
+                }
+            )
+        }
         if (showCinemaDialog) {
             CinemaDialog(
                 bitmap = bitmap,
-                onDismissRequest = {showCinemaDialog = false}
+                onDismissRequest = { showCinemaDialog = false }
             ) { title, description, rating, isWatched ->
-                viewModel.saveData(user.email,title,description,rating,isWatched,bitmap!!)
+                viewModel.saveData(user.email, title, description, rating, isWatched, bitmap!!)
                 showCinemaDialog = false
 
             }
         }
-        if (errorMessage != null){
-            Toast.makeText(context,errorMessage,Toast.LENGTH_LONG).show()
+        if (errorMessage != null) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             viewModel.clearMessage()
         }
 
@@ -178,13 +201,18 @@ fun MainScreen() {
 }
 
 @Composable
-fun ScreenContent(viewModel: MainViewModel,userId: String,modifier: Modifier = Modifier) {
+fun ScreenContent(
+    viewModel: MainViewModel,
+    userId: String,
+    modifier: Modifier = Modifier,
+    onDeleteRequest: (Int) -> Unit
+) {
 
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
     LaunchedEffect(userId) {
-        viewModel.retrieveData('"'+userId+'"')
+        viewModel.retrieveData('"' + userId + '"')
     }
 
     when (status) {
@@ -206,7 +234,12 @@ fun ScreenContent(viewModel: MainViewModel,userId: String,modifier: Modifier = M
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 items(data) {
-                    ListItem(cinema = it)
+                    ListItem(
+                        cinema = it,
+                        onDeleteClicked = {
+                            onDeleteRequest(it.id)
+                        }
+                    )
                 }
             }
         }
@@ -242,7 +275,10 @@ fun ScreenContent(viewModel: MainViewModel,userId: String,modifier: Modifier = M
 }
 
 @Composable
-fun ListItem(cinema: Cinema) {
+fun ListItem(
+    cinema: Cinema,
+    onDeleteClicked: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .padding(4.dp)
@@ -270,18 +306,48 @@ fun ListItem(cinema: Cinema) {
                 .background(Color(red = 0f, green = 0f, blue = 0f, alpha = 0.5f))
                 .padding(4.dp)
         ) {
-            Text(
-                text = cinema.title,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = cinema.rating.toString(),
-                fontStyle = FontStyle.Italic,
-                fontSize = 14.sp,
-                color = Color.White
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f).padding(4.dp)
+                ) {
+                    Text(
+                        text = cinema.title,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = cinema.rating.toString(),
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                    Text(
+                        text = if (cinema.isWatched) stringResource(R.string.done) else stringResource(
+                            R.string.notdone
+                        ),
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                }
+                IconButton(
+                    onClick = { onDeleteClicked() },
+                    modifier = Modifier
+                        .padding(1.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete),
+                        tint = Color.White
+                    )
+                }
+            }
         }
+
+
     }
 }
 
@@ -321,15 +387,15 @@ private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserD
     }
 }
 
-private suspend fun signOut(context: Context,dataStore: UserDataStore) {
+private suspend fun signOut(context: Context, dataStore: UserDataStore) {
     try {
         val credentialManager = CredentialManager.create(context)
         credentialManager.clearCredentialState(
             ClearCredentialStateRequest()
         )
         dataStore.saveData(User())
-    }catch (e: ClearCredentialException){
-        Log.e("SIGN-IN","Error: ${e.errorMessage}")
+    } catch (e: ClearCredentialException) {
+        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
@@ -337,17 +403,17 @@ private suspend fun signOut(context: Context,dataStore: UserDataStore) {
 private fun getCroppedImage(
     resolver: ContentResolver,
     result: CropImageView.CropResult
-): Bitmap?{
+): Bitmap? {
     if (!result.isSuccessful) {
-        Log.e("IMAGE","Error: ${result.error}")
+        Log.e("IMAGE", "Error: ${result.error}")
         return null
     }
     val uri = result.uriContent ?: return null
 
     return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-        MediaStore.Images.Media.getBitmap(resolver,uri)
-    }else{
-        val source = ImageDecoder.createSource(resolver,uri)
+        MediaStore.Images.Media.getBitmap(resolver, uri)
+    } else {
+        val source = ImageDecoder.createSource(resolver, uri)
         ImageDecoder.decodeBitmap(source)
     }
 }

@@ -13,8 +13,11 @@
     <string name="description">Description</string>
     <string name="rating">Rating</string>
     <string name="iswatched">Watched yet?</string>
-    <string name="done">Done</string>
-    <string name="notdone">Not yet</string>
+    <string name="done">Watched</string>
+    <string name="notdone">Not Watched</string>
     <string name="batal">Cancel</string>
     <string name="simpan">Save</string>
+    <string name="delete_question">Do you really wanna delete this movie?</string>
+    <string name="delete">Delete</string>
+    <string name="abort">Cancel</string>
 </resources>

@@ -17,4 +17,7 @@
     <string name="notdone">Belum</string>
     <string name="batal">Batal</string>
     <string name="simpan">Simpan</string>
+    <string name="delete_question">Apakah anda yakin ingin menghapus data ini?</string>
+    <string name="delete">Hapus</string>
+    <string name="abort">Batal</string>
 </resources>
